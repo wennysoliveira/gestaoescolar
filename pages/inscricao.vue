@@ -66,7 +66,6 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <NuxtLink to="/plano-gestao" class="btn-primary inline-flex items-center justify-center px-6 py-3">Enviar Plano de Gestão</NuxtLink>
           <NuxtLink to="/" class="btn-secondary inline-flex items-center justify-center px-6 py-3">Voltar ao Início</NuxtLink>
         </div>
       </div>
