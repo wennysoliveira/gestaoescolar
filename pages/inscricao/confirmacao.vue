@@ -41,7 +41,7 @@
             
             <div>
               <p class="text-sm font-medium text-gray-500">Data da Inscrição</p>
-              <p class="text-lg text-gray-900">{{ formatDate(new Date()) }}</p>
+              <p class="text-lg text-gray-900">{{ dataInscricao }}</p>
             </div>
             
             <div v-if="confirmData?.nomeCompleto">
@@ -186,16 +186,6 @@
         <!-- Ações -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <NuxtLink
-            to="/plano-gestao"
-            class="btn-primary inline-flex items-center justify-center px-6 py-3"
-          >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Enviar Plano de Gestão
-          </NuxtLink>
-          
-          <NuxtLink
             to="/"
             class="btn-secondary inline-flex items-center justify-center px-6 py-3"
           >
@@ -231,14 +221,18 @@ onMounted(() => {
   }
 })
 
-// Função para formatar data
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+// Data formatada (SSR-safe)
+const dataInscricao = computed(() => {
+  try {
+    return new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return ''
+  }
+})
 </script>

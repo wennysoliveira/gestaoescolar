@@ -156,6 +156,7 @@
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Candidato</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Protocolo</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPF</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Formação</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pontuação</th>
@@ -175,6 +176,9 @@
                     <div class="text-sm font-medium text-gray-900">{{ inscricao.nomeCompleto }}</div>
                     <div class="text-sm text-gray-500">{{ inscricao.email }}</div>
                   </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+                  {{ inscricao.protocolo }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ formatCPF(inscricao.cpf) }}

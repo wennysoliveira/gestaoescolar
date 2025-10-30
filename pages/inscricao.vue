@@ -48,7 +48,7 @@
             </div>
             <div>
               <p class="text-sm font-medium text-gray-500">Data da Inscrição</p>
-              <p class="text-lg text-gray-900">{{ formatDate(new Date()) }}</p>
+              <p class="text-lg text-gray-900">{{ dataInscricao }}</p>
             </div>
             <div v-if="confirmData?.nomeCompleto">
               <p class="text-sm font-medium text-gray-500">Nome Completo</p>
@@ -423,6 +423,20 @@ const {
 
 const { isManagementPlanPeriod, managementPlanMessage } = useDateRange()
 const isConfirmationMode = computed(() => route.path.includes('/inscricao/confirmacao') || !!route.query.protocolo)
+
+const dataInscricao = computed(() => {
+  try {
+    return new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return ''
+  }
+})
 
 const confirmData = process.client
   ? JSON.parse(sessionStorage.getItem('inscricao_confirmacao') || 'null')

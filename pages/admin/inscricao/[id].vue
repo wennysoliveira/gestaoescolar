@@ -41,6 +41,11 @@
           
           <div class="grid md:grid-cols-2 gap-6">
             <div>
+              <label class="block text-sm font-medium text-gray-500">Protocolo</label>
+              <p class="mt-1 text-sm text-gray-900 font-mono">{{ candidato.protocolo }}</p>
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-500">Nome Completo</label>
               <p class="mt-1 text-sm text-gray-900">{{ candidato.nomeCompleto }}</p>
             </div>

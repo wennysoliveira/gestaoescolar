@@ -3,7 +3,7 @@ type SessionRecord = {
   lastActive: number
 }
 
-const FIVE_MINUTES_MS = 5 * 60 * 1000
+const THIRTY_MINUTES_MS = 30 * 60 * 1000
 
 const sessions = new Map<string, SessionRecord>()
 
@@ -30,11 +30,11 @@ export function destroyAdminSession(sessionId: string | undefined | null): void 
 }
 
 export function isAdminSessionExpired(record: SessionRecord): boolean {
-  return Date.now() - record.lastActive > FIVE_MINUTES_MS
+  return Date.now() - record.lastActive > THIRTY_MINUTES_MS
 }
 
 export const SESSION_COOKIE_NAME = 'admin_session'
-export const SESSION_MAX_AGE_SECONDS = 300
-export const SESSION_MAX_AGE_MS = FIVE_MINUTES_MS
+export const SESSION_MAX_AGE_SECONDS = 1800
+export const SESSION_MAX_AGE_MS = THIRTY_MINUTES_MS
 
 

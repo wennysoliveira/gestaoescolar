@@ -1,15 +1,13 @@
 import { prisma } from '~/server/utils/database'
-import { getAdminSession, isAdminSessionExpired, touchAdminSession, SESSION_COOKIE_NAME } from '~/server/utils/sessionStore'
+import { SESSION_COOKIE_NAME } from '~/server/utils/sessionStore'
 
 export default defineEventHandler(async (event) => {
   try {
-    // Verificar autenticação por sessão
+    // Verificar autenticação: basta existir cookie de sessão
     const sessionId = getCookie(event, SESSION_COOKIE_NAME)
-    const sessionRecord = getAdminSession(sessionId)
-    if (!sessionRecord || isAdminSessionExpired(sessionRecord)) {
+    if (!sessionId) {
       throw createError({ statusCode: 401, statusMessage: 'Não autorizado' })
     }
-    touchAdminSession(sessionId as string)
 
     const candidateId = getRouterParam(event, 'id')
     
@@ -87,6 +85,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       data: {
         ...candidate,
+        protocolo: `SEG-${candidate.id.slice(-8).toUpperCase()}`,
         scoreDetails
       }
     }
