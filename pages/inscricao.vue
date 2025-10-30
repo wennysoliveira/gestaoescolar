@@ -647,19 +647,5 @@ const submitForm = async () => {
   }
 }
 
-// Persistir seleção de formação e sexo para evitar perda em erros
-if (process.client) {
-  onMounted(() => {
-    const savedFormacao = sessionStorage.getItem('form_formacaoAcademica')
-    const savedSexo = sessionStorage.getItem('form_sexo')
-    if (savedFormacao) form.value.formacaoAcademica = savedFormacao
-    if (savedSexo) form.value.sexo = savedSexo
-  })
-  watch(() => form.value.formacaoAcademica, (val) => {
-    sessionStorage.setItem('form_formacaoAcademica', val || '')
-  })
-  watch(() => form.value.sexo, (val) => {
-    sessionStorage.setItem('form_sexo', val || '')
-  })
-}
+// Removida a persistência automática dos selects para não pré-preencher em primeira carga
 </script>

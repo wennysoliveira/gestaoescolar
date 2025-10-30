@@ -5,6 +5,7 @@ import { saveFile, validateMimeType, ALLOWED_MIME_TYPES } from '~/server/utils/f
 export default defineEventHandler(async (event) => {
   try {
     const formData = await readMultipartFormData(event)
+    const isRelaxed = process.env.NODE_ENV !== 'production' || process.env.RELAX_INSCRICAO === 'true'
     
     if (!formData) {
       throw createError({
@@ -77,7 +78,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // Modo relaxado para desenvolvimento: não exigir todos os documentos
-    const isRelaxed = process.env.NODE_ENV !== 'production' || process.env.RELAX_INSCRICAO === 'true'
 
     // Lista de documentos obrigatórios (apenas se não estiver relaxado)
     const requiredDocuments = [
