@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Candidate {
+  id                    String   @id @default(cuid())
+  nomeCompleto          String
+  cpf                   String   @unique
+  email                 String   @unique
+  telefone              String
+  unidadeEnsino         String
+  funcaoAtual           String
+  formacaoAcademica     String
+  tempoExperienciaGestao Int
+  sexo                  String?  // Para validar se precisa certificado de reservista
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // Relacionamentos
+  documents             Document[]
+  titles                Title[]
+  managementPlan        ManagementPlan?
+  resources             Resource[]
+  
+  @@map("candidates")
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  type        String   // Tipo do documento (rg, cpf, comprovante_residencia, etc.)
+  filename    String   // Nome do arquivo original
+  filepath    String   // Caminho do arquivo no servidor
+  mimeType    String   // Tipo MIME do arquivo
+  size        Int      // Tamanho em bytes
+  uploadedAt  DateTime @default(now())
+  
+  // Relacionamento
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  
+  @@map("documents")
+}
+
+model Title {
+  id          String   @id @default(cuid())
+  type        String   // Tipo do título (doutorado, mestrado, pos_graduacao, etc.)
+  filename    String?  // Nome do arquivo (se houver)
+  filepath    String?  // Caminho do arquivo (se houver)
+  mimeType    String?  // Tipo MIME (se houver)
+  size        Int?     // Tamanho em bytes (se houver)
+  value       Float?   // Valor numérico (para tempo de magistério, por exemplo)
+  description String?  // Descrição adicional
+  uploadedAt  DateTime @default(now())
+  
+  // Relacionamento
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  
+  @@map("titles")
+}
+
+model ManagementPlan {
+  id          String   @id @default(cuid())
+  filename    String
+  filepath    String
+  mimeType    String
+  size        Int
+  uploadedAt  DateTime @default(now())
+  
+  // Relacionamento
+  candidateId String   @unique
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  
+  @@map("management_plans")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String   // Hash da senha
+  name      String
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("admins")
+}
+
+// Tabela para recursos futuros (não implementar agora)
+model Resource {
+  id          String   @id @default(cuid())
+  type        String   // Tipo do recurso (homologacao, gabarito, resultado)
+  status      String   @default("pending") // pending, approved, rejected
+  description String?  // Descrição do recurso
+  response    String?  // Resposta da comissão
+  submittedAt DateTime @default(now())
+  reviewedAt  DateTime?
+  
+  // Relacionamento
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  
+  @@map("resources")
+}

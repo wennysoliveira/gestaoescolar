@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Simples</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        .form-group { margin: 20px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input { padding: 10px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .error { color: red; margin-top: 10px; }
+        .success { color: green; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Login Simples - Teste</h1>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" value="admin">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" value="admin123">
+        </div>
+        
+        <button type="submit">Entrar</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script>
+        console.log('Script carregado!');
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Formulário submetido!');
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const result = document.getElementById('result');
+            
+            console.log('Credenciais:', { username, password });
+            
+            if (username === 'admin' && password === 'admin123') {
+                // Definir cookies
+                document.cookie = 'admin-session=true; path=/; max-age=86400';
+                document.cookie = 'admin-user={"id":"admin-1","username":"admin","name":"Administrador","email":"admin@santarita.gov.br"}; path=/; max-age=86400';
+                
+                result.innerHTML = '<div class="success">✅ Login realizado! Redirecionando...</div>';
+                
+                // Redirecionar
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 1000);
+            } else {
+                result.innerHTML = '<div class="error">❌ Credenciais inválidas!</div>';
+            }
+        });
+    </script>
+</body>
+</html>
