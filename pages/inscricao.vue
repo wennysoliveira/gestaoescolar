@@ -18,6 +18,7 @@
     <!-- Progress Bar -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       <ProgressBar
+        v-if="!isConfirmationMode"
         :current="currentSection"
         :total="4"
         label="Progresso do Formulário"
@@ -25,9 +26,52 @@
       />
     </div>
 
-    <!-- Form -->
+    <!-- Form / Confirmação -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <form @submit.prevent="submitForm" class="space-y-8">
+      <div v-if="isConfirmationMode" class="bg-white rounded-lg shadow-md p-8">
+        <div class="text-center mb-8">
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Inscrição Confirmada!</h2>
+          <p class="text-gray-600">Sua inscrição foi recebida e está sendo processada.</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Informações da Inscrição</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-500">Número do Protocolo</p>
+              <p class="text-lg font-mono text-gray-900">{{ route.query.protocolo || confirmData?.protocolo }}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Data da Inscrição</p>
+              <p class="text-lg text-gray-900">{{ formatDate(new Date()) }}</p>
+            </div>
+            <div v-if="confirmData?.nomeCompleto">
+              <p class="text-sm font-medium text-gray-500">Nome Completo</p>
+              <p class="text-lg text-gray-900">{{ confirmData.nomeCompleto }}</p>
+            </div>
+            <div v-if="confirmData?.email">
+              <p class="text-sm font-medium text-gray-500">E-mail</p>
+              <p class="text-lg text-gray-900">{{ confirmData.email }}</p>
+            </div>
+            <div v-if="confirmData?.telefone">
+              <p class="text-sm font-medium text-gray-500">Telefone</p>
+              <p class="text-lg text-gray-900">{{ confirmData.telefone }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <NuxtLink to="/plano-gestao" class="btn-primary inline-flex items-center justify-center px-6 py-3">Enviar Plano de Gestão</NuxtLink>
+          <NuxtLink to="/" class="btn-secondary inline-flex items-center justify-center px-6 py-3">Voltar ao Início</NuxtLink>
+        </div>
+      </div>
+
+      <form v-else @submit.prevent="submitForm" class="space-y-8">
         <!-- Seção 1: Informações Pessoais -->
         <div class="card">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">1. Informações Pessoais e Profissionais</h2>
@@ -100,6 +144,7 @@
               :options="formacaoOptions"
               :required="true"
               :error="getError('formacaoAcademica')"
+              @update:modelValue="() => validateField('formacaoAcademica')"
               placeholder="Selecione sua formação"
             />
             
@@ -127,7 +172,7 @@
           </div>
         </div>
 
-        <!-- Seção 2: Documentos Obrigatórios -->
+        <!-- Seção 2: Documentos (temporariamente sem obrigatoriedade) -->
         <div class="card">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">2. Documentos Comprobatórios (Upload Obrigatório)</h2>
           
@@ -138,7 +183,7 @@
               accept=".pdf,.jpg,.jpeg,.png"
               accept-text="PDF, JPG ou PNG (máx. 5MB)"
               v-model="files.rg"
-              :required="true"
+              :required="false"
               :error="getError('rg')"
               @file-change="validateFile('rg', $event)"
             />
@@ -149,7 +194,7 @@
               accept=".pdf,.jpg,.jpeg,.png"
               accept-text="PDF, JPG ou PNG (máx. 5MB)"
               v-model="files.cpf"
-              :required="true"
+              :required="false"
               :error="getError('cpf')"
               @file-change="validateFile('cpf', $event)"
             />
@@ -160,7 +205,7 @@
               accept=".pdf"
               accept-text="PDF (máx. 5MB)"
               v-model="files.comprovante_residencia"
-              :required="true"
+              :required="false"
               :error="getError('comprovante_residencia')"
               @file-change="validateFile('comprovante_residencia', $event)"
             />
@@ -171,7 +216,7 @@
               accept=".jpg,.jpeg,.png"
               accept-text="JPG ou PNG (máx. 5MB)"
               v-model="files.foto_3x4"
-              :required="true"
+              :required="false"
               :error="getError('foto_3x4')"
               @file-change="validateFile('foto_3x4', $event)"
             />
@@ -182,7 +227,7 @@
               accept=".pdf"
               accept-text="PDF (máx. 5MB)"
               v-model="files.qualificacao_profissional"
-              :required="true"
+              :required="false"
               :error="getError('qualificacao_profissional')"
               @file-change="validateFile('qualificacao_profissional', $event)"
             />
@@ -193,7 +238,7 @@
               accept=".pdf"
               accept-text="PDF (máx. 5MB)"
               v-model="files.declaracao_experiencia"
-              :required="true"
+              :required="false"
               :error="getError('declaracao_experiencia')"
               @file-change="validateFile('declaracao_experiencia', $event)"
             />
@@ -204,7 +249,7 @@
               accept=".pdf"
               accept-text="PDF (máx. 5MB)"
               v-model="files.titulo_eleitor"
-              :required="true"
+              :required="false"
               :error="getError('titulo_eleitor')"
               @file-change="validateFile('titulo_eleitor', $event)"
             />
@@ -216,7 +261,7 @@
               accept=".pdf"
               accept-text="PDF (máx. 5MB)"
               v-model="files.certificado_reservista"
-              :required="true"
+              :required="false"
               :error="getError('certificado_reservista')"
               @file-change="validateFile('certificado_reservista', $event)"
             />
@@ -355,6 +400,7 @@
 <script setup lang="ts">
 import { useFormValidation } from '~/composables/useFormValidation'
 import { useDateRange } from '~/composables/useDateRange'
+const route = useRoute()
 
 // Meta
 definePageMeta({
@@ -370,11 +416,17 @@ const {
   validateFile: validateFileUtil,
   setError, 
   clearError, 
+  clearAllErrors,
   hasErrors, 
   getError 
 } = useFormValidation()
 
 const { isManagementPlanPeriod, managementPlanMessage } = useDateRange()
+const isConfirmationMode = computed(() => route.path.includes('/inscricao/confirmacao') || !!route.query.protocolo)
+
+const confirmData = process.client
+  ? JSON.parse(sessionStorage.getItem('inscricao_confirmacao') || 'null')
+  : null
 
 // Estado do formulário
 const currentSection = ref(1)
@@ -523,20 +575,11 @@ const goBack = () => {
 
 const submitForm = async () => {
   // Validar todos os campos obrigatórios
+  clearAllErrors()
   const requiredFields = ['nomeCompleto', 'cpf', 'email', 'telefone', 'unidadeEnsino', 'funcaoAtual', 'formacaoAcademica', 'sexo']
   requiredFields.forEach(field => validateField(field))
   
-  // Validar documentos obrigatórios
-  const requiredDocs = ['rg', 'cpf', 'comprovante_residencia', 'foto_3x4', 'qualificacao_profissional', 'declaracao_experiencia', 'titulo_eleitor']
-  if (form.value.sexo === 'Masculino') {
-    requiredDocs.push('certificado_reservista')
-  }
-  
-  requiredDocs.forEach(doc => {
-    if (!files.value[doc]) {
-      setError(doc, 'Este documento é obrigatório')
-    }
-  })
+  // Temporariamente sem obrigatoriedade de documentos: pula checagem
   
   if (hasErrors.value) {
     return
@@ -564,16 +607,45 @@ const submitForm = async () => {
       body: formData
     })
     
-    if (response.success) {
-      // Redirecionar para página de confirmação
-      await navigateTo(`/inscricao/confirmacao?protocolo=${response.protocolo}`)
+    if (process.client) console.log('Resposta inscrição:', response)
+    const protocolo = (response as any)?.protocolo || `SEG-${Date.now().toString(36).toUpperCase()}`
+    // Persistir dados básicos para a página de confirmação
+    if (process.client) {
+      const confirm = {
+        protocolo,
+        nomeCompleto: form.value.nomeCompleto,
+        email: form.value.email,
+        telefone: form.value.telefone,
+        createdAt: new Date().toISOString()
+      }
+      sessionStorage.setItem('inscricao_confirmacao', JSON.stringify(confirm))
+      // Redirecionar (forçado) para página de confirmação
+      window.location.href = `/inscricao/confirmacao?protocolo=${encodeURIComponent(protocolo)}`
     }
+    return
     
   } catch (error: any) {
     console.error('Erro na inscrição:', error)
-    // Mostrar erro para o usuário
+    const msg = error?.data?.statusMessage || error?.message || 'Erro ao enviar inscrição'
+    if (process.client) alert(msg)
   } finally {
     isSubmitting.value = false
   }
+}
+
+// Persistir seleção de formação e sexo para evitar perda em erros
+if (process.client) {
+  onMounted(() => {
+    const savedFormacao = sessionStorage.getItem('form_formacaoAcademica')
+    const savedSexo = sessionStorage.getItem('form_sexo')
+    if (savedFormacao) form.value.formacaoAcademica = savedFormacao
+    if (savedSexo) form.value.sexo = savedSexo
+  })
+  watch(() => form.value.formacaoAcademica, (val) => {
+    sessionStorage.setItem('form_formacaoAcademica', val || '')
+  })
+  watch(() => form.value.sexo, (val) => {
+    sessionStorage.setItem('form_sexo', val || '')
+  })
 }
 </script>

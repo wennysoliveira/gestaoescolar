@@ -43,6 +43,21 @@
               <p class="text-sm font-medium text-gray-500">Data da Inscrição</p>
               <p class="text-lg text-gray-900">{{ formatDate(new Date()) }}</p>
             </div>
+            
+            <div v-if="confirmData?.nomeCompleto">
+              <p class="text-sm font-medium text-gray-500">Nome Completo</p>
+              <p class="text-lg text-gray-900">{{ confirmData.nomeCompleto }}</p>
+            </div>
+            
+            <div v-if="confirmData?.email">
+              <p class="text-sm font-medium text-gray-500">E-mail</p>
+              <p class="text-lg text-gray-900">{{ confirmData.email }}</p>
+            </div>
+            
+            <div v-if="confirmData?.telefone">
+              <p class="text-sm font-medium text-gray-500">Telefone</p>
+              <p class="text-lg text-gray-900">{{ confirmData.telefone }}</p>
+            </div>
           </div>
         </div>
 
@@ -204,6 +219,17 @@ definePageMeta({
 // Obter protocolo da URL
 const route = useRoute()
 const protocolo = route.query.protocolo as string
+
+// Carregar dados básicos salvos na submissão (apenas no client)
+const confirmData = ref<any>(null)
+onMounted(() => {
+  try {
+    const raw = sessionStorage.getItem('inscricao_confirmacao')
+    confirmData.value = raw ? JSON.parse(raw) : null
+  } catch {
+    confirmData.value = null
+  }
+})
 
 // Função para formatar data
 const formatDate = (date: Date): string => {

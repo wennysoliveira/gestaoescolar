@@ -11,25 +11,25 @@ export function createSession(sessionId: string, email: string): void {
   sessions.set(sessionId, { email, lastActive: Date.now() })
 }
 
-export function getSession(sessionId: string | undefined | null): SessionRecord | null {
+export function getAdminSession(sessionId: string | undefined | null): SessionRecord | null {
   if (!sessionId) return null
   const record = sessions.get(sessionId)
   return record ?? null
 }
 
-export function touchSession(sessionId: string): void {
+export function touchAdminSession(sessionId: string): void {
   const record = sessions.get(sessionId)
   if (!record) return
   record.lastActive = Date.now()
   sessions.set(sessionId, record)
 }
 
-export function destroySession(sessionId: string | undefined | null): void {
+export function destroyAdminSession(sessionId: string | undefined | null): void {
   if (!sessionId) return
   sessions.delete(sessionId)
 }
 
-export function isSessionExpired(record: SessionRecord): boolean {
+export function isAdminSessionExpired(record: SessionRecord): boolean {
   return Date.now() - record.lastActive > FIVE_MINUTES_MS
 }
 

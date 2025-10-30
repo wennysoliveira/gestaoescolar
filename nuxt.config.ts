@@ -1,9 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
   compatibilityDate: '2025-10-28',
+  sourcemap: false,
+  vite: {
+    optimizeDeps: {
+      disabled: true
+    }
+  },
   runtimeConfig: {
     // Private keys (only available on server-side)
     jwtSecret: process.env.JWT_SECRET || 'sua-chave-secreta-padrao',

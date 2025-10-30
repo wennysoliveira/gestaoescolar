@@ -33,18 +33,28 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Validar dados do formulário
-    const validatedData = inscricaoSchema.parse({
-      nomeCompleto: formDataObj.nomeCompleto,
-      cpf: formDataObj.cpf,
-      email: formDataObj.email,
-      telefone: formDataObj.telefone,
-      unidadeEnsino: formDataObj.unidadeEnsino,
-      funcaoAtual: formDataObj.funcaoAtual,
-      formacaoAcademica: formDataObj.formacaoAcademica,
-      tempoExperienciaGestao: parseInt(formDataObj.tempoExperienciaGestao),
-      sexo: formDataObj.sexo
-    })
+    // Normalizar valores numéricos vazios
+    const tempoExperienciaGestaoNum = Number.isFinite(Number(formDataObj.tempoExperienciaGestao))
+      ? Number(formDataObj.tempoExperienciaGestao)
+      : 0
+
+    // Validar dados do formulário (retornar 400 em erro de validação)
+    let validatedData: typeof inscricaoSchema._type
+    try {
+      validatedData = inscricaoSchema.parse({
+        nomeCompleto: formDataObj.nomeCompleto,
+        cpf: formDataObj.cpf,
+        email: formDataObj.email,
+        telefone: formDataObj.telefone,
+        unidadeEnsino: formDataObj.unidadeEnsino,
+        funcaoAtual: formDataObj.funcaoAtual,
+        formacaoAcademica: formDataObj.formacaoAcademica,
+        tempoExperienciaGestao: tempoExperienciaGestaoNum,
+        sexo: formDataObj.sexo
+      })
+    } catch (err: any) {
+      throw createError({ statusCode: 400, statusMessage: 'Dados inválidos: ' + (err?.errors?.[0]?.message || 'verifique o formulário') })
+    }
 
     // Verificar se CPF já existe
     const existingCandidate = await prisma.candidate.findUnique({
@@ -70,7 +80,10 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Validar documentos obrigatórios
+    // Modo relaxado para desenvolvimento: não exigir todos os documentos
+    const isRelaxed = process.env.NODE_ENV !== 'production' || process.env.RELAX_INSCRICAO === 'true'
+
+    // Lista de documentos obrigatórios (apenas se não estiver relaxado)
     const requiredDocuments = [
       DOCUMENT_TYPES.RG,
       DOCUMENT_TYPES.CPF,
@@ -81,18 +94,18 @@ export default defineEventHandler(async (event) => {
       DOCUMENT_TYPES.TITULO_ELEITOR
     ]
 
-    // Adicionar certificado de reservista se for masculino
     if (validatedData.sexo === 'Masculino') {
       requiredDocuments.push(DOCUMENT_TYPES.CERTIFICADO_RESERVISTA)
     }
 
-    // Verificar se todos os documentos obrigatórios foram enviados
-    for (const docType of requiredDocuments) {
-      if (!files[docType]) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: `Documento obrigatório não encontrado: ${docType}`
-        })
+    if (!isRelaxed) {
+      for (const docType of requiredDocuments) {
+        if (!files[docType]) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: `Documento obrigatório não encontrado: ${docType}`
+          })
+        }
       }
     }
 
@@ -132,10 +145,11 @@ export default defineEventHandler(async (event) => {
         }
       })
 
-      // Salvar documentos obrigatórios
+      // Salvar documentos enviados (se existirem)
       const documents = []
       for (const [docType, file] of Object.entries(files)) {
-        if (requiredDocuments.includes(docType as any)) {
+        // No modo relaxado, salva qualquer documento enviado; no modo estrito, apenas os obrigatórios
+        if (isRelaxed || requiredDocuments.includes(docType as any)) {
           const { filepath, filename } = await saveFile(file, validatedData.cpf, docType)
           
           const document = await tx.document.create({
@@ -152,7 +166,7 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      // Salvar títulos opcionais
+      // Salvar títulos opcionais (se existirem)
       const titles = []
       for (const [titleType, file] of Object.entries(files)) {
         if (Object.values(TITLE_TYPES).includes(titleType as any)) {

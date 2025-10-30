@@ -287,85 +287,22 @@ const debouncedSearch = () => {
   }, 500)
 }
 
-// Dados de exemplo
-const sampleData = [
-  {
-    id: '1',
-    nomeCompleto: 'João Silva Santos',
-    cpf: '12345678901',
-    email: 'joao@email.com',
-    formacaoAcademica: 'Mestrado',
-    score: 15,
-    createdAt: new Date().toISOString(),
-    _count: { documents: 8, titles: 3 },
-    managementPlan: null
-  },
-  {
-    id: '2',
-    nomeCompleto: 'Maria Oliveira Costa',
-    cpf: '98765432100',
-    email: 'maria@email.com',
-    formacaoAcademica: 'Doutorado',
-    score: 25,
-    createdAt: new Date().toISOString(),
-    _count: { documents: 7, titles: 5 },
-    managementPlan: { filename: 'plano_gestao.pdf' }
-  },
-  {
-    id: '3',
-    nomeCompleto: 'Pedro Santos Lima',
-    cpf: '11122233344',
-    email: 'pedro@email.com',
-    formacaoAcademica: 'Especialização',
-    score: 8,
-    createdAt: new Date().toISOString(),
-    _count: { documents: 6, titles: 2 },
-    managementPlan: null
-  },
-  {
-    id: '4',
-    nomeCompleto: 'Ana Paula Ferreira',
-    cpf: '55566677788',
-    email: 'ana@email.com',
-    formacaoAcademica: 'Licenciatura',
-    score: 5,
-    createdAt: new Date().toISOString(),
-    _count: { documents: 8, titles: 1 },
-    managementPlan: { filename: 'plano_ana.pdf' }
-  },
-  {
-    id: '5',
-    nomeCompleto: 'Carlos Eduardo Silva',
-    cpf: '99988877766',
-    email: 'carlos@email.com',
-    formacaoAcademica: 'Mestrado',
-    score: 18,
-    createdAt: new Date().toISOString(),
-    _count: { documents: 5, titles: 4 },
-    managementPlan: null
-  },
-  {
-    id: '6',
-    nomeCompleto: 'Fernanda Costa Lima',
-    cpf: '44433322211',
-    email: 'fernanda@email.com',
-    formacaoAcademica: 'Doutorado',
-    score: 30,
-    createdAt: new Date().toISOString(),
-    _count: { documents: 9, titles: 6 },
-    managementPlan: { filename: 'plano_fernanda.pdf' }
-  }
-]
+// Dados do backend (sem mock)
 
 // Carregar inscrições
 const loadInscricoes = async () => {
   loading.value = true
   
   try {
-    // Carregar dados de exemplo
-    allInscricoes.value = sampleData
+    const response = await $fetch('/api/admin/inscricoes', { credentials: 'include' })
+    if ((response as any)?.success && Array.isArray((response as any).data)) {
+      allInscricoes.value = (response as any).data
+    } else if (Array.isArray(response)) {
+      allInscricoes.value = response as any
+    } else {
+      allInscricoes.value = []
+    }
     applyFilters()
-    
   } catch (error) {
     console.error('Erro ao carregar inscrições:', error)
   } finally {
