@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      # Garante o mesmo caminho do SQLite em dev/prod
+      - DATABASE_URL=file:./prisma/dev.db
+      # Necessário para hot-reload estável no Windows/Docker Desktop
+      - CHOKIDAR_USEPOLLING=1
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+    volumes:
+      - ./:/app
+      # Evita sobrepor node_modules do container com o host
+      - /app/node_modules
+    command: sh -c "npm install && npx prisma generate && npm run dev"
+    restart: unless-stopped
+
+

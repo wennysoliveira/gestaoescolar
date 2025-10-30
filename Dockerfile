@@ -4,6 +4,9 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
+# Ensure Prisma SQLite path is consistent in all environments
+ENV DATABASE_URL="file:./prisma/dev.db"
+
 # Copy package files
 COPY package*.json ./
 
