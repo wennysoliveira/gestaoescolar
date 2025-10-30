@@ -4,8 +4,12 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Ensure Prisma SQLite path is consistent in all environments
-ENV DATABASE_URL="file:./prisma/dev.db"
+# Ensure Prisma SQLite path is consistent in all environments (absolute path in container)
+ENV DATABASE_URL="file:/app/prisma/dev.db"
+
+# Ensure the SQLite directory exists and is writable in production
+RUN mkdir -p prisma \
+  && chown -R node:node prisma
 
 # Copy package files
 COPY package*.json ./
@@ -24,6 +28,9 @@ RUN npm run build
 
 # Remove dev dependencies after build
 RUN npm prune --production
+
+# Run the application as non-root for proper FS permissions
+USER node
 
 # Expose port
 EXPOSE 3000
