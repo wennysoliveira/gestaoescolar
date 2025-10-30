@@ -80,19 +80,7 @@
               </div>
             </div>
             
-            <div class="flex items-start">
-              <div class="flex-shrink-0">
-                <div class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100">
-                  <span class="text-sm font-medium text-blue-600">2</span>
-                </div>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-sm font-medium text-gray-900">Enviar Plano de Gestão</h4>
-                <p class="text-sm text-gray-600">
-                  Entre 15/12/2025 e 19/12/2025, você poderá enviar seu Plano de Gestão Escolar.
-                </p>
-              </div>
-            </div>
+            
             
             <div class="flex items-start">
               <div class="flex-shrink-0">
